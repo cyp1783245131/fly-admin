@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>充值岗</title>
+    <#include "/header.html"/>
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/bootstrap-switch.css">
+    <script src="${request.contextPath}/statics/libs/bootstrap-switch.js"></script>
+</head>
+<body>
+<script>
+
+    function Select1(){
+        $.ajax({
+            type: "get",
+            url: baseURL + "sys/pay/download",
+            contentType: "application/json",
+            success: function(r){
+                alert("导出成功")
+            }
+        });
+    }
+
+</script>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" id="starttime" v-model="q.starttime" @keyup.enter="query" placeholder="开始时间">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" id="endtime" v-model="q.endtime" @keyup.enter="query" placeholder="结束时间">
+            </div>
+            <a class="btn btn-primary" @click="query">&nbsp;查询</a>
+            <a class="btn btn-primary" onclick="Select1();">&nbsp;导出</a>
+            <#if shiro.hasPermission("sys:pay:save")>
+                <a class="btn btn-primary" @click="add"></i>&nbsp;充值</a>
+            </#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">充值金额</div>
+                <div class="col-sm-10">
+                    <input type="text" id="pmoney" v-model="pay.pmoney" class="form-control" placeholder="充值金额"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="充值"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/pay.js?_${.now?long}"></script>
+<script src="${request.contextPath}/statics/libs/laydate/laydate.js"></script>
+<script>
+    //开始时间
+    laydate.render({
+        elem: '#starttime',
+        type: 'date'
+    });
+
+    //结束时间
+    laydate.render({
+        elem: '#endtime',
+        type: 'date'
+    });
+</script>
+
+</body>
+</html>

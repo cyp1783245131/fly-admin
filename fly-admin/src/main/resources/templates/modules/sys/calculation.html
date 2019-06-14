@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>计算规则</title>
+    <#include "/header.html">
+<body>
+<div id="app" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.rule" @keyup.enter="query" placeholder="计算规则">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <#if shiro.hasPermission("sys:calculation:save")>
+                <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            </#if>
+            <!--<#if shiro.hasPermission("sys:calculation:update")>-->
+                <!--<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>-->
+            <!--</#if>-->
+            <!--<#if shiro.hasPermission("sys:calculation:delete")>-->
+                <!--<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;批量删除</a>-->
+            <!--</#if>-->
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计算规则</div>
+                <div class="col-sm-10">
+                    <input type="text" id="rule" class="form-control" v-model="calculation.rule" placeholder="计算规则"/>
+                    <input type="hidden" name="calculationId" id="mid" v-model="calculation.calculation_id">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">开始时间</div>
+                <div class="col-sm-10">
+                    <input type="text" id="createTime" readonly="readonly" class="form-control" v-model="calculation.createTime" placeholder="开始时间"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">结束时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="endTime" id="endTime" style="width: 370px"
+                           v-model="calculation.endTime" readonly="readonly" placeholder="结束时间">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">可使用额度</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="usableQuota" id="usableQuota" style="width: 370px"
+                           v-model="calculation.usableQuota" placeholder="可使用额度">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">新锐营</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="company1" id="company1" style="width: 370px"
+                           v-model="calculation.company1" placeholder="新锐营">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">益斗</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="company2" id="company2" style="width: 370px"
+                           v-model="calculation.company2" placeholder="益斗">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">第三方</div>
+                <div class="col-sm-10">
+                    <input type="text" id="thirdparty" class="form-control" v-model="calculation.thirdparty" placeholder="第三方"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="deptLayer" style="display: none;padding:10px;">
+    <ul id="deptTree" class="ztree"></ul>
+</div>
+<script src="${request.contextPath}/statics/js/modules/sys/calculation.js?_${.now?long}"></script>
+</body>
+</html>

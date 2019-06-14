@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>引流统计</title>
+    <#include "/header.html">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"
+          rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+</head>
+<body>
+<div id="rrapp"  style="background-color:#fafafa;" v-cloak>
+    <div class="qs_clear">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="info-box" style="box-shadow:1px 1px 1px rgba(0,0,0,0.1)">
+                <div class="f_sr_m">
+                    <div class="f_sr_u f_color_1">
+                        <div class="f_sr_w">总引流次数</div>
+                        <div class="f_sr_z"></div>
+                    </div>
+                    <div class="f_sr_d">
+                        <span id="z_count"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="info-box" style="box-shadow:1px 1px 1px rgba(0,0,0,0.1)">
+                <div class="f_sr_m">
+                    <div class="f_sr_u f_color_2">
+                        <div class="f_sr_w">符合区域引流数量</div>
+                        <div class="f_sr_z"></div>
+                    </div>
+                    <div class="f_sr_d">
+                        <span id="f_count"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active">
+        <a href="#home" data-toggle="tab">符合区域引流列表</a>
+    </li>
+    <li><a href="#ios" data-toggle="tab">总引流列表</a></li>
+
+    <li class="dropdown">
+        <a href="#" id="myTabDrop1" class="dropdown-toggle"
+           data-toggle="dropdown">导出 <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+            <li>
+                <a href="#areaExport" tabindex="-1" data-toggle="tab">导出区域引流</a>
+            </li>
+            <li>
+                <a href="#allExport" tabindex="-1" data-toggle="tab">导出总量引流</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="home">
+        <table id="jqAreaGrid"></table>
+        <div id="jqAreaGridPager"></div>
+    </div>
+    <div class="tab-pane fade" id="ios">
+        <table id="jqAllGrid"></table>
+        <div id="jqAllGridPager"></div>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/fcomin.js?_${.now?long}"></script>
+</body>
+
+<link rel="stylesheet" href="${request.contextPath}/statics/css/AdminLTE.min.css">
+<link rel="stylesheet" href="${request.contextPath}/statics/css/fly_style.css">
+<script>
+    // function download1() {
+    //     // alert(1)
+    //     var url = "sys/fcomin/export";
+    //     $.ajax({
+    //         type: "get",
+    //         url: baseURL + url,
+    //         contentType: "application/json",
+    //         data: "",
+    //         success: function (r) {
+    //             alert("导出成功")
+    //         }
+    //     });
+    //
+    // }
+</script>
+</html>

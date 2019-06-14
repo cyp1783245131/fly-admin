@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>引流计划</title>
+    <#include "/header.html"/>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.name" @keyup.enter="query" placeholder="计划名称">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <#if shiro.hasPermission("sys:yinliu:save")>
+                <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            </#if>
+            <#if shiro.hasPermission("sys:yinliu:update")>
+                <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+            </#if>
+            <#if shiro.hasPermission("sys:yinliu:delete")>
+                <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+            </#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <div class="col-sm-10">
+                    <input type="hidden" class="form-control" v-model="yinliu.id"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划名称</div>
+                <div class="col-sm-10">
+                    <input type="text" id="name" class="form-control" v-model="yinliu.name" placeholder="计划名称"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划时间</div>
+                <div class="col-sm-10">
+                    <input type="text" id="time" class="form-control" placeholder="计划时间"/>
+                </div>
+            </div>
+
+            <div class="form-group" hidden>
+                <div class="col-sm-2 control-label">开始时间</div>
+                <div class="col-sm-10">
+                    <input type="text" id="stime" class="form-control" v-model="yinliu.stime" placeholder="开始时间"/>
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <div class="col-sm-2 control-label">结束时间</div>
+                <div class="col-sm-10">
+                    <input type="text" id="etime" class="form-control" v-model="yinliu.etime" placeholder="结束时间"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">引流范围</div>
+                <div class="col-sm-10">
+                    <input type="text" id="range" class="area-duoxuan form-control" value="" data-value="" placeholder="引流范围"/>
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <div class="col-sm-2 control-label">引流范围(真)</div>
+                <div class="col-sm-10">
+                    <input type="text" id="ranges" class="form-control" v-model="yinliu.ranges" placeholder="引流范围"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划流量</div>
+                <div class="col-sm-10">
+                    自定义：<input type="number" id="meths" v-model="yinliu.meth" placeholder="计划流量" style="width: 75px"/>
+                    <span data-toggle="buttons">
+                        <span data-toggle="buttons">
+                            <label class="btn btn-info btn-xs" @click="subFlow(1)">
+                                <input type="radio" name="options" id="option1" autocomplete="off"> 1
+                            </label>
+                            <label class="btn btn-info btn-xs" @click="subFlow(5)">
+                                <input type="radio" name="options" id="option5" autocomplete="off"> 5
+                            </label>
+                            <label class="btn btn-info btn-xs" @click="subFlow(10)">
+                                <input type="radio" name="options" id="option10" autocomplete="off"> 10
+                            </label>
+                            <label class="btn btn-info btn-xs" @click="subFlow(50)">
+                                <input type="radio" name="options" id="option50" autocomplete="off"> 50
+                            </label>
+                            <label class="btn btn-info btn-xs" @click="subFlow(100)">
+                                <input type="radio" name="options" id="option100" autocomplete="off"> 100
+                            </label>
+                            <label class="btn btn-info btn-xs" @click="subFlow(500)">
+                                <input type="radio" name="options" id="option500" autocomplete="off"> 500
+                            </label>
+                        </span>
+                    </span>单位：万
+                </div>
+            </div>
+
+            <div class="form-group" hidden>
+                <div class="col-sm-2 control-label">引流位置(真)</div>
+                <div class="col-sm-10">
+                    <input type="text" id="adds" class="form-control" v-model="yinliu.adds" placeholder="引流位置"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">引流位置</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="planChannel" data-toggle="modal" data-target="#channelModal" placeholder="引流位置"/>
+                </div>
+                <!-- 引流位置模态框（Modal） -->
+                <div class="modal fade" id="channelModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    引流位置
+                                </h4>
+                            </div>
+                            <div class="modal-body"  style="height: 200px;">
+                                <ul class="list-inline">
+                                    <li class="modal-li" >
+                                        <span id="location1" @click="subLocation(1,$event)" class="label label-default" style="background-color: gray">百度</span>
+                                        <span id="location2" @click="subLocation(2,$event)" class="label label-default" style="background-color: gray">谷歌</span>
+                                        <span id="location3" @click="subLocation(3,$event)" class="label label-default" style="background-color: gray">微博</span>
+                                        <span id="location4" @click="subLocation(4,$event)" class="label label-default" style="background-color: gray">微信</span>
+                                        <span id="location5" @click="subLocation(5,$event)" class="label label-default" style="background-color: gray">网易新闻</span>
+                                        <span id="location6" @click="subLocation(6,$event)" class="label label-default" style="background-color: gray">今日头条</span>
+                                        <span id="location7" @click="subLocation(7,$event)" class="label label-default" style="background-color: gray">抖音</span>
+                                        <span id="location8" @click="subLocation(8,$event)" class="label label-default" style="background-color: gray">小红书</span>
+                                        <span id="location9" @click="subLocation(9,$event)" class="label label-default" style="background-color: gray">滴滴</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" data-dismiss="modal" @click="saveLocation($event)"  class="btn btn-primary">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" v-for="channel in selectedChannels">
+                <div class="col-sm-2 control-label"></div>
+                <div class="col-sm-10">
+                    <div class="channelDiv">
+                        <table>
+                            <tr>
+                                <td>{{channel}}：</td>
+                                <td>
+                                    <input type="hidden"/>
+                                    <div class="layui-upload-drag">
+                                        <i class="layui-icon"></i>
+                                        <p>点击上传，或将文件拖拽到此处</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>引流至网址：</td>
+                                <td><input type="text"/></td>
+                            </tr>
+                            <tr>
+                                <td>同步推送所有引流区域内人保微盟门店：</td>
+                                <td><input type="checkbox"/></td>
+                            </tr>
+                            <tr>
+                                <td>文案：</td>
+                                <td><textarea rows="4" style="min-width: 90%"></textarea></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">状态</div>
+                <label class="radio-inline">
+                    <input type="radio" name="status" value="1" v-model="yinliu.status"/> 正常
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="status" value="0" v-model="yinliu.status"/> 禁用
+                </label>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/yinliu.js?_${.now?long}"></script>
+
+<link href="${request.contextPath}/statics/css/style.css" type="text/css" rel="stylesheet">
+
+<script src="${request.contextPath}/statics/libs/laydate/laydate.js"></script>
+<script src="${request.contextPath}/statics/libs/js/City_data.js"></script>
+<script src="${request.contextPath}/statics/libs/js/areadata.js"></script>
+<script src="${request.contextPath}/statics/libs/js/auto_area.js"></script>
+
+<script>
+    laydate.render({
+        elem: '#time'
+        ,type: 'datetime'
+        ,range: '~'
+    });
+</script>
+</body>
+</html>

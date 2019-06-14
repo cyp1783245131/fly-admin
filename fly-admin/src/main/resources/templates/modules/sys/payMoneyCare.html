@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>批量付款明细</title>
+    <#include "/header.html"/>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <#if shiro.hasPermission("sys:payMoneyCare:update")>
+            <a class="btn btn-primary" @click="update">&nbsp;编辑</a>
+        </#if>
+        <#if shiro.hasPermission("sys:payMoneyCare:update")>
+            <a class="btn btn-primary" @click="update2">&nbsp;生成付款批次</a>
+        </#if>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">保单号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pid" placeholder="保单号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">车牌号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pcat" placeholder="车牌号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">支付金额</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pay" placeholder="支付金额"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">净保费</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pmoney" placeholder="净保费"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计算规则</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.rule" placeholder="计算规则"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">户名</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pname" placeholder="户名"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">银行</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pbank" placeholder="银行"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">开户行</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pobank" placeholder="开户行"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">银行卡号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pbanknum" placeholder="银行卡号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">权益申请状态</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pstatus" placeholder="权益申请状态"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+
+    <div v-show="!showList2" class="panel panel-default">
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">批次号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoneyCare.pid" placeholder="批次号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/payMoneyCare.js?_${.now?long}"></script>
+<script src="${request.contextPath}/statics/libs/laydate/laydate.js"></script>
+
+</body>
+</html>

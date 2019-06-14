@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>总览</title>
+    <script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+    <script type="text/javascript" src="${request.contextPath}/statics/js/qxt/jQuery.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/jquery.jqplot.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/examples/syntaxhighlighter/scripts/shCore.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/examples/syntaxhighlighter/scripts/shBrushJScript.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/examples/syntaxhighlighter/scripts/shBrushXml.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.logAxisRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.barRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.pointLabels.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="${request.contextPath}/statics/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+    <link class="include" rel="stylesheet" type="text/css"
+          href="${request.contextPath}/statics/js/jqplot/jquery.jqplot.min.css"/>
+    <link type="text/css" rel="stylesheet"
+          href="${request.contextPath}/statics/js/jqplot/examples/syntaxhighlighter/styles/shCoreDefault.min.css"/>
+    <link type="text/css" rel="stylesheet"
+          href="${request.contextPath}/statics/js/jqplot/examples/syntaxhighlighter/styles/shThemejqPlot.min.css"/>
+    <script src="${request.contextPath}/statics/js/qxt/m_jqplot.js"></script>
+</head>
+<body>
+<div id="app">
+    <div id="chart0"></div>
+    <div id="chart1"></div>
+    <div id="chart2"></div>
+    <div id="chart3"></div>
+</div>
+
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            sy: [0, 0, 0, 0, 0, 0],
+            yd: [0, 0, 0, 0, 0, 0],
+            dsf: [0, 0, 0, 0, 0, 0],
+            xry: [0, 0, 0, 0, 0, 0],
+            rq: [],
+            ledgerList: []
+        },
+        methods: {
+            chart: function (index) {
+                return "chart" + index
+            }
+        },
+        created: function () {
+            $.ajax({
+                type: "POST",
+                url: "../../sys/overview/findAll",
+                contentType: "application/json",
+                data: "",
+                success: function (r) {
+                    vm.ledgerList = r.ledgerList;
+                    var year = new Date().getFullYear();
+                    var month = new Date().getMonth() + 1;
+                    if (month - 5 == 0) {
+                        var m = 12
+                        var y = year - 1;
+                    }
+                    var time = [ month  == 0? y + "年" + m + "月": year + "年" + (month ) + "月"  , year + "年" + (month    ) + "月",year + "年" + (month    ) + "月", year + "年" + (month - 2) + "月", year + "年" + (month - 1) + "月", year + "年" + month + "月"]; var syTotal = 0;
+                    var ydTotal = 0;
+                    var dsfTotal = 0;
+                    var xryTotal = 0;
+                    for (var i = 0; i < vm.ledgerList.length; i++) {
+                        var date = new Date(vm.ledgerList[i].ledgerTime);
+                        if (date.getMonth() + 1 == month) {
+                            vm.sy[5] = (vm.ledgerList[i].aall)
+                            vm.yd[5] = (vm.ledgerList[i].call)
+                            vm.dsf[5] = (vm.ledgerList[i].dall)
+                            vm.xry[5] = (vm.ledgerList[i].ball)
+                        }
+                        if (date.getMonth() + 1 == month - 1) {
+                            vm.sy[4] = (vm.ledgerList[i].aall)
+                            vm.yd[4] = (vm.ledgerList[i].call)
+                            vm.dsf[4] = (vm.ledgerList[i].dall)
+                            vm.xry[4] = (vm.ledgerList[i].ball)
+                        }
+
+                        if (date.getMonth() + 1 == month - 2) {
+                            vm.sy[3] = (vm.ledgerList[i].aall)
+                            vm.yd[3] = (vm.ledgerList[i].call)
+                            vm.dsf[3] = (vm.ledgerList[i].dall)
+                            vm.xry[3] = (vm.ledgerList[i].ball)
+                        }
+
+                        if (date.getMonth() + 1 == month   ) {
+                            vm.sy[2] = (vm.ledgerList[i].aall)
+                            vm.yd[2] = (vm.ledgerList[i].call)
+                            vm.dsf[2] = (vm.ledgerList[i].dall)
+                            vm.xry[2] = (vm.ledgerList[i].ball)
+                        }
+
+                        if (date.getMonth() + 1 == month   ) {
+                            vm.sy[1] = (vm.ledgerList[i].aall)
+                            vm.yd[1] = (vm.ledgerList[i].call)
+                            vm.dsf[1] = (vm.ledgerList[i].dall)
+                            vm.xry[1] = (vm.ledgerList[i].ball)
+                        }
+                        var m = 0;
+                        if (month  == 0) {
+                            m = 12;
+                            if (date.getMonth() + 1 == m) {
+                                vm.sy[0] = (vm.ledgerList[i].aall)
+                                vm.yd[0] = (vm.ledgerList[i].ball)
+                                vm.dsf[0] = (vm.ledgerList[i].dall)
+                                vm.xry[0] = (vm.ledgerList[i].call)
+                            }
+                        }else{
+                            if (date.getMonth() + 1 == month ) {
+                                vm.sy[0] = (vm.ledgerList[i].aall)
+                                vm.yd[0] = (vm.ledgerList[i].ball)
+                                vm.dsf[0] = (vm.ledgerList[i].dall)
+                                vm.xry[0] = (vm.ledgerList[i].call)
+                            }
+                        }
+
+                    }
+
+                    var data;
+                    var data_max = 10000000; //Y轴最大刻度
+                    var line_title = ["A"]; //曲线名称
+                    var y_label = "这是金额"; //Y轴标题
+                    var x_label = "这是月份"; //X轴标题
+
+                    var x = time; //定义X轴刻度值
+                    var title = "这是标题"; //统计图标标题
+                    data = [vm.sy]
+                    j.jqplot.diagram.base("chart0", data, line_title, "所有商户总支出表", x, x_label, y_label, data_max, 1);
+                    data = [vm.yd]
+                    j.jqplot.diagram.base("chart1", data, line_title, "所有益斗数据表", x, x_label, y_label, data_max, 1);
+                    data = [vm.dsf]
+                    j.jqplot.diagram.base("chart2", data, line_title, "所有第三方数据表", x, x_label, y_label, data_max, 1);
+                    data = [vm.xry]
+                    j.jqplot.diagram.base("chart3", data, line_title, "所有新锐营数据表", x, x_label, y_label, data_max, 1);
+                }
+            });
+        }
+    });
+
+</script>
+</body>
+</html>

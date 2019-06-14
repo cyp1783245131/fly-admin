@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>批量付款</title>
+    <#include "/header.html"/>
+</head>
+<body>
+<script>
+
+    function Select1(){
+        $.ajax({
+            type: "get",
+            url: baseURL + "sys/payMoney/download",
+            contentType: "application/json",
+            success: function(r){
+                alert("导出成功")
+            }
+        });
+    }
+
+</script>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" id="starttime" v-model="q.starttime" @keyup.enter="query" placeholder="开始时间">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" id="endtime" v-model="q.endtime" @keyup.enter="query" placeholder="结束时间">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="monid" v-model="q.monid" @keyup.enter="query" placeholder="批次号">
+            </div>
+            <a class="btn btn-primary" @click="query">查询</a>
+            <a class="btn btn-primary" >提交复核</a>
+            <a class="btn btn-primary" >明细查看</a>
+            <#if shiro.hasPermission("sys:payMoney:delete")>
+                <a class="btn btn-primary" @click="del">&nbsp;删除</a>
+            </#if>
+            <#if shiro.hasPermission("sys:payMoney:save")>
+                <a class="btn btn-primary" @click="add">&nbsp;添加</a>
+            </#if>
+            <a class="btn btn-primary" onclick="Select1();">&nbsp;导出</a>
+            <a class="btn btn-primary" @click="daoru">&nbsp;导入</a>
+            <input type="file" id="upfile" name="upfile" placeholder="" onchange="importExp(1);" style="display: none;"/>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <div class="col-sm-10">
+                    <input type="hidden" class="form-control" v-model="payMoney.id"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">批次号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoney.monid" placeholder="批次号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">支付笔数</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoney.pcount" placeholder="支付笔数"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">支付金额</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoney.pmoney" placeholder="支付金额"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">申请时间</div>
+                <div class="col-sm-10">
+                    <input type="text" id="ptime" class="form-control" v-model="payMoney.ptime" placeholder="申请时间"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">手续费</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="payMoney.pay" placeholder="手续费"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/payMoney.js?_${.now?long}"></script>
+<script src="${request.contextPath}/statics/libs/laydate/laydate.js"></script>
+<script>
+    //开始时间
+    laydate.render({
+        elem: '#starttime',
+        type: 'date'
+    });
+
+    //结束时间
+    laydate.render({
+        elem: '#endtime',
+        type: 'date'
+    });
+
+    laydate.render({
+        elem: '#ptime',
+        type: 'datetime'
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>区域规则列表</title>
+    <#include "/header.html">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="${request.contextPath}/statics/css/style.css" type="text/css" rel="stylesheet">
+
+        <script src="${request.contextPath}/statics/libs/js/City_data.js"></script>
+        <script src="${request.contextPath}/statics/libs/js/areadata.js"></script>
+        <script src="${request.contextPath}/statics/libs/js/auto_area.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.rname" @keyup.enter="query" placeholder="计划名称">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+</div>
+<table id="jqGrid"></table>
+<div id="jqGridPager"></div>
+</div>
+
+<div v-show="!showList" class="panel panel-default">
+    <div class="panel-heading">{{title}}</div>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div class="col-sm-2 control-label">规则名称</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="rname" v-model="region.rname" placeholder="规则名称(限制10个字)"
+                       maxlength="10"/>
+            </div>
+        </div><div class="form-group">
+            <div class="col-sm-2 control-label">符合区域比例</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="rsure" v-model="rsure" placeholder="符合区域比例"
+                       onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+            </div>
+        </div><div class="form-group">
+            <div class="col-sm-2 control-label">不符合区域比例</div>
+            <div class="col-sm-10">
+                <!--<input type="text" class="form-control" id="rnsure"  v-model="region.rnsure" placeholder="不符合区域比例"-->
+                       <!--onkeyup="value=value.replace(/[^\d.]/g,'')"    maxlength="10"/>-->
+                <span id="rnsure" class="form-control"  v-model="region.rnsure">{{rnsureMessage}}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label"></div>
+            <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+            &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+        </div>
+    </form>
+</div>
+</div>
+
+<!-- 选择部门 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+    <ul id="deptTree" class="ztree"></ul>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/region.js?_${.now?long}"></script>
+
+</body>
+
+
+</html>

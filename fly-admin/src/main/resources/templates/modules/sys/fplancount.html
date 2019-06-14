@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>引流列表</title>
+    <#include "/header.html">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="${request.contextPath}/statics/css/style.css" type="text/css" rel="stylesheet">
+
+        <script src="${request.contextPath}/statics/libs/js/City_data.js"></script>
+        <script src="${request.contextPath}/statics/libs/js/areadata.js"></script>
+        <script src="${request.contextPath}/statics/libs/js/auto_area.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.dname" @keyup.enter="query" placeholder="计划名称">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <#if shiro.hasPermission("sys:fplancount:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+        </#if>
+        <#if shiro.hasPermission("sys:fplancount:update")>
+        <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+    </#if>
+    <#if shiro.hasPermission("sys:fplancount:delete")>
+    <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+</#if>
+</div>
+<table id="jqGrid"></table>
+<div id="jqGridPager"></div>
+</div>
+
+<div v-show="!showList" class="panel panel-default">
+    <div class="panel-heading">{{title}}</div>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div class="col-sm-2 control-label"></div>
+            <div class="col-sm-10">
+                <input type="hidden" v-model="fplancount.id"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">计划名称</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="dname" v-model="fplancount.dname" placeholder="计划名称(限制10个字)"
+                       maxlength="10"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">计划时间</div>
+            <div class="col-sm-10">
+                <input type="text" id="time" class="form-control" placeholder="计划时间"/>
+            </div>
+        </div>
+
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">开始时间</div>
+            <div class="col-sm-10">
+                <input type="text" id="kaishi"  v-model="fplancount.kaishi" placeholder="开始时间"/>
+            </div>
+        </div>
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">结束时间</div>
+            <div class="col-sm-10">
+                <input type="text" id="jieshu"  v-model="fplancount.jieshu" placeholder="结束时间"/>
+            </div>
+        </div>
+        <!--引流范围-->
+        <div class="form-group">
+            <div class="col-sm-2 control-label">引流范围</div>
+            <div class="col-sm-10">
+                <input type="text" id="planCity" class="form-control area-duoxuan" placeholder="引流范围"/>
+            </div>
+        </div>
+
+
+        <!--计划流量-->
+        <div class="form-group">
+            <div class="col-sm-2 control-label">计划流量</div>
+            <div class="col-sm-10">
+                自定义&nbsp;<input @change="selectFreeFlow" id="flow" style="width: 60px;" type="number" v-model="planFreeFlow"/>
+                &nbsp;<span @click="selectFlow" id="freeFlow1"    class="label label-default divSpan">1</span>
+                &nbsp;<span @click="selectFlow" id="freeFlow5"    class="label label-default divSpan">5</span>
+                &nbsp;<span @click="selectFlow" id="freeFlow10"   class="label label-default divSpan">10</span>
+                &nbsp;<span @click="selectFlow" id="freeFlow50"   class="label label-default divSpan">50</span>
+                &nbsp;<span @click="selectFlow" id="freeFlow100"  class="label label-default divSpan">100</span>
+                &nbsp;<span @click="selectFlow" id="freeFlow500"  class="label label-default divSpan">500</span>
+                &nbsp;单位：万
+            </div>
+        </div>
+        <div class="form-group">
+
+                <div class="col-sm-2 control-label">引流位置</div>
+                <div class="col-sm-10">
+                    <input type="text" id="location" v-model="fplancount.location" class="form-control" data-toggle="modal" data-target=".bs-example-modal-lg" placeholder="引流位置">
+                    <!-- 引流位置模态框（Modal） -->
+                    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 class="modal-title" id="myModalLabel">
+                                        引流位置
+                                    </h4>
+                                </div>
+                                <div class="modal-body"  style="height: 200px;">
+                                    <ul class="list-inline">
+                                        <li class="modal-li" v-for="channel in fchannelList">
+                                            <h4>
+                                                <span  @click="selectChannel" class="label label-default divChannelSpan">{{channel.cname}}</span>
+                                            </h4>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" @click="cancelSelectChanns" >关闭</button>
+                                    <button type="button" data-dismiss="modal" @click="saveLocation"  class="btn btn-primary">确认</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="form-group" v-for="channel in selectedChannels">
+            <div class="col-sm-2 control-label"></div>
+            <div class="col-sm-10">
+                <div class="channelDiv">
+                    <table>
+                        <tr><td>{{channel.cname}}：</td><td>
+                            <input type="hidden" :id="'imageurl'+channel.id"/>
+                            <div v-if="channel.cimage=='1'" class="layui-upload-drag" :id="'uploadFile'+channel.id">
+                                <i class="layui-icon"></i>
+                                <p>点击上传，或将文件拖拽到此处</p>
+                            </div>
+                        </td></tr>
+                        <tr v-if="channel.curl=='1'" ><td>引流至网址：</td><td><input class="id" :id="'planurl'+channel.id" type="text"  /></td></tr>
+                        <tr v-if="channel.cwm =='1'" ><td>同步推送所有引流区域内人保微盟门店：</td><td><input :id="'planwm'+channel.id"  type="checkbox" /></td></tr>
+                        <tr v-if="channel.cwenan =='1'"><td>文案：</td><td><textarea  :id="'wenan'+channel.id"  rows="4" style="min-width: 90%" ></textarea></td></tr>
+                    </table>
+
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-2 control-label">计划状态</div>
+            <div class="col-sm-10">
+                <!--<input id="plan_status" type="checkbox" class="form-control" v-model="fplancount.state" checked/>-->
+                <input type="checkbox" id="state" class="checkbox" v-model="fplancount.state"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-2 control-label">微盟门店</div>
+            <div class="col-sm-10">
+                <input type="text" id="planwms" class="form-control" v-model="fplancount.planwms" data-toggle="modal" data-target="#wmModal" placeholder="微盟用户"/>
+            </div>
+            <!-- 微盟门店模态框（Modal） -->
+            <div class="modal fade" id="wmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="form-group col-sm-4">
+                                <input type="text" class="form-control" v-model="q.mobile" @keyup.enter="query" placeholder="微盟店铺手机号">
+                            </div>
+                            <a class="btn btn-primary" @click="queryWmUsers">查询</a>
+                        </div>
+                        <div class="modal-body"  style="height: 500px;">
+                            <table id="jqWmGrid" border="1">
+
+                            </table>
+                            <div id="jqWmGridPager"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"  data-dismiss="modal">关闭</button>
+                            <button type="button" data-dismiss="modal" @click="saveWmUsers" class="btn btn-primary">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">创建用户</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" v-model="fplancount.cuser" placeholder="创建用户"/>
+            </div>
+        </div>
+
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">创建时间</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" v-model="fplancount.ctime" placeholder="创建时间"/>
+            </div>
+        </div>
+
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">修改时间</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" v-model="fplancount.utime" placeholder="修改时间"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-2 control-label"></div>
+            <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+            &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+        </div>
+    </form>
+</div>
+</div>
+
+<!-- 选择部门 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+    <ul id="deptTree" class="ztree"></ul>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/fplancount.js?_${.now?long}"></script>
+
+</body>
+
+<script>
+
+    layui.use(['laydate','upload'], function() {
+        var $ = layui.jquery,upload = layui.upload;
+        var laydate = layui.laydate;
+
+        //计划时间
+        laydate.render({
+            elem: '#time'
+            ,type: 'datetime'
+            ,range: '~'
+        });
+
+    });
+    // $(function () {
+    //     laydate.render({
+    //         elem: '#time'
+    //         , type: 'datetime'
+    //         , range: '~'
+    //         , format: 'yyyy-MM-dd HH:mm:ss'
+    //     });
+    // })
+</script>
+</html>

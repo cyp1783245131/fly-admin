@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>引流计划</title>
+    <#include "/header.html">
+
+<body>
+
+<div id="app" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.planName" @keyup.enter="query" placeholder="用户名">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <#if shiro.hasPermission("sys:drainage:save")>
+                <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            </#if>
+            <#if shiro.hasPermission("sys:drainage:update")>
+                <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+            </#if>
+            <#if shiro.hasPermission("sys:drainage:delete")>
+                <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;批量删除</a>
+            </#if>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划名称</div>
+                <div class="col-sm-10">
+                    <input type="text" id="planName" class="form-control" v-model="drainage.planName" placeholder="计划名称"/>
+                    <input type="hidden" name="cid" id="cid" v-model="drainage.cid">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="planTime" id="planTime" v-model="planTime"
+                           readonly="readonly" placeholder="计划时间">
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <div class="col-sm-2 control-label">开始时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="createTime" id="createTime" style="width: 370px"
+                           v-model="drainage.createTime" readonly="readonly">
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <div class="col-sm-2 control-label">结束时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="endTime" id="endTime" style="width: 370px"
+                           v-model="drainage.endTime" readonly="readonly">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">引流范围</div>
+                <div class="col-sm-10">
+                    <input type="text" id="fanwei" class="form-control area-duoxuan" v-model="drainage.fanwei" placeholder="引流范围" data-value=""/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">引流位置</div>
+                <div class="col-sm-10">
+                    <input type="text" id="position" v-model="drainage.position" class="form-control" data-toggle="modal" data-target=".bs-example-modal-lg" placeholder="引流位置">
+
+                    <!-- 引流位置模态框（Modal） -->
+                    <div class="modal fade bs-example-modal-lg"  role="dialog" aria-labelledby="myLargeModalLabel">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">
+                                        引流位置
+                                    </h4>
+                                </div>
+                                <div class="modal-body" style="height: 200px;">
+                                    <ul class="list-inline">
+                                        <li class="modal-li">
+                                            <span v-for="position in positionList" id="position(position.pid)" @click="subPosition(position.pid ,$event)" class="label label-default">{{position.pname}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                    <button type="button" data-dismiss="modal" @click="savePosition($event)" class="btn btn-primary">确认
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-group" v-for="channel in selectedChannels">
+                <div class="col-sm-2 control-label"></div>
+                <div class="col-sm-10">
+                    <div class="channelDiv">
+                        <table >
+                            <tr>
+                                <td>{{channel}}：</td>
+                                <td>
+                                    <input type="hidden" />
+                                    <div class="layui-upload-drag" >
+                                        <i class="layui-icon"></i>
+                                        <p>点击上传，或将文件拖拽到此处</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr >
+                                <td>引流至网址：</td>
+                                <td><input  type="text"/></td>
+                            </tr>
+                            <tr >
+                                <td>同步推送所有引流区域内人保微盟门店：</td>
+                                <td><input  type="checkbox"/></td>
+                            </tr>
+                            <tr >
+                                <td>文案：</td>
+                                <td><textarea  rows="4" style="min-width: 90%"></textarea></td>
+                            </tr>
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划流量</div>
+                <div class="col-sm-10">
+                    <input type="checkbox" @click="customFlow($event)"/>自定义
+                    <input type="number" v-model="drainage.planFlow" disabled="disabled" placeholder="计划流量" id="planFlow"/>
+                    <span data-toggle="buttons">
+                        <span data-toggle="buttons">
+                            <label class="btn btn-primary" @click="subFlow(1)">
+                                <input type="radio" name="options" id="option1" autocomplete="off"> 1
+                            </label>
+                            <label class="btn btn-primary" @click="subFlow(5)">
+                                <input type="radio" name="options" id="option5" autocomplete="off"> 5
+                            </label>
+                            <label class="btn btn-primary" @click="subFlow(10)">
+                                <input type="radio" name="options" id="option10" autocomplete="off"> 10
+                            </label>
+                            <label class="btn btn-primary" @click="subFlow(50)">
+                                <input type="radio" name="options" id="option50" autocomplete="off"> 50
+                            </label>
+                            <label class="btn btn-primary" @click="subFlow(100)">
+                                <input type="radio" name="options" id="option100" autocomplete="off"> 100
+                            </label>
+                            <label class="btn btn-primary" @click="subFlow(500)">
+                                <input type="radio" name="options" id="option500" autocomplete="off"> 500
+                            </label>
+                        </span>
+                    </span>单位：万
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">微盟门店</div>
+                <div class="col-sm-10">
+                    <input type="text" id="planWms" class="form-control" data-toggle="modal" data-target="#wmModal" placeholder="微盟用户"/>
+                </div>
+                <!-- 微盟门店模态框（Modal） -->
+                <div class="modal fade" id="wmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="form-group col-sm-4">
+                                    <input type="text" class="form-control" @keyup.enter="query" placeholder="微盟店铺手机号">
+                                </div>
+                                <a class="btn btn-primary" >查询</a>
+                            </div>
+                            <div class="modal-body" style="height: 500px;">
+                                <div class="ui-jqgrid " id="gbox_jqWmGrid" style="width: 568px;" dir="ltr">
+                                    <div class="jqgrid-overlay ui-overlay" id="lui_jqWmGrid"></div>
+                                    <div class="loading row" id="load_jqWmGrid" style="display: none;">读取中...</div>
+                                    <div class="ui-jqgrid-view table-responsive" id="gview_jqWmGrid" role="grid"
+                                         style="width: 568px;">
+                                        <div class="ui-jqgrid-titlebar ui-jqgrid-caption" style="display: none;"><a
+                                                title="Toggle Expand Collapse Grid"
+                                                class="ui-jqgrid-titlebar-close HeaderButton " role="link"
+                                                style="right: 0px;"><span
+                                                class="ui-jqgrid-headlink glyphicon glyphicon-circle-arrow-up"></span></a><span
+                                                class="ui-jqgrid-title"></span></div>
+                                        <div class="ui-jqgrid-hdiv" style="width: 566px;">
+                                            <div class="ui-jqgrid-hbox">
+                                                <table class="ui-jqgrid-htable ui-common-table table table-bordered"
+                                                       role="presentation" aria-labelledby="gbox_jqWmGrid"
+                                                       style="width: 550px;">
+                                                    <thead>
+                                                    <tr class="ui-jqgrid-labels" role="row">
+                                                        <th class="ui-th-column ui-th-ltr" id="jqWmGrid_rn"
+                                                            role="columnheader" style="width: 25px;">
+                                                            <div class="ui-th-div" id="jqgh_jqWmGrid_rn"><span
+                                                                    class="s-ico" style="display: none;"><span
+                                                                    class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"
+                                                                    sort="asc"></span><span
+                                                                    class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"
+                                                                    sort="desc"></span></span></div>
+                                                        </th>
+                                                        <th class="ui-th-column ui-th-ltr" id="jqWmGrid_cb"
+                                                            role="columnheader" style="width: 35px;">
+                                                            <div class="ui-th-div" id="jqgh_jqWmGrid_cb"><input
+                                                                    class="cbox" id="cb_jqWmGrid" role="checkbox"
+                                                                    type="checkbox"><span class="s-ico"
+                                                                                          style="display: none;"><span
+                                                                    class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"
+                                                                    sort="asc"></span><span
+                                                                    class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"
+                                                                    sort="desc"></span></span></div>
+                                                        </th>
+                                                        <th class="ui-th-column ui-th-ltr " id="jqWmGrid_wmId"
+                                                            role="columnheader" style="width: 50px; display: none;">
+                                                            <span class="ui-jqgrid-resize ui-jqgrid-resize-ltr"
+                                                                  style="cursor: col-resize;">&nbsp;</span>
+                                                            <div class="ui-th-div ui-jqgrid-sortable"
+                                                                 id="jqgh_jqWmGrid_wmId">wmId<span class="s-ico"
+                                                                                                   style="display: none;"><span
+                                                                    class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"
+                                                                    sort="asc"></span><span
+                                                                    class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"
+                                                                    sort="desc"></span></span></div>
+                                                        </th>
+                                                        <th class="ui-th-column ui-th-ltr" id="jqWmGrid_wmMobile"
+                                                            role="columnheader" style="width: 245px;"><span
+                                                                class="ui-jqgrid-resize ui-jqgrid-resize-ltr"
+                                                                style="cursor: col-resize;">&nbsp;</span>
+                                                            <div class="ui-th-div ui-jqgrid-sortable"
+                                                                 id="jqgh_jqWmGrid_wmMobile">店铺手机号ID<span class="s-ico"
+                                                                                                          style="display: none;"><span
+                                                                    class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"
+                                                                    sort="asc"></span><span
+                                                                    class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"
+                                                                    sort="desc"></span></span></div>
+                                                        </th>
+                                                        <th class="ui-th-column ui-th-ltr " id="jqWmGrid_wmName"
+                                                            role="columnheader" style="width: 245px;"><span
+                                                                class="ui-jqgrid-resize ui-jqgrid-resize-ltr"
+                                                                style="cursor: col-resize;">&nbsp;</span>
+                                                            <div class="ui-th-div ui-jqgrid-sortable"
+                                                                 id="jqgh_jqWmGrid_wmName">店主姓名<span class="s-ico"
+                                                                                                     style="display: none;"><span
+                                                                    class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"
+                                                                    sort="asc"></span><span
+                                                                    class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"
+                                                                    sort="desc"></span></span></div>
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default"  data-dismiss="modal">关闭</button>
+                                <button type="button" data-dismiss="modal" class="btn btn-primary">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">计划状态</div>
+                <div class="col-sm-10" id="mySwitch">
+                    <div class="switch" data-on="danger" data-off="primary">
+                        <input id="planType" type="checkbox" v-model="drainage.planType"/>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="deptLayer" style="display: none;padding:10px;">
+    <ul id="deptTree" class="ztree"></ul>
+</div>
+<script>
+    $(function () {
+
+        $("#jqGrid").jqGrid({
+            url: baseURL + 'sys/drainage/list',
+            datatype: "json",
+            colModel: [
+                {label: 'cid', name: 'cid', index: "cid", width: 230, hidden: true},
+                {label: '计划名称', name: 'planName', index: "plan_name", width: 230},
+                {label: '开始时间', name: 'createTime', index: "create_time", width: 230},
+                {label: '结束时间', name: 'endTime', index: "end_time", width: 230},
+                {label: '范围', name: 'fanwei', index: "fanwei", width: 230},
+                {label: '引流位置', name: 'position', index: "position", width: 230},
+                {label: '计划流量（万）', name: 'planFlow', index: "plan_flow", width: 230},
+                {
+                    label: '计划状态',
+                    name: 'planType',
+                    index: "plan_type",
+                    width: 220,
+                    formatter: function (value, options, rowObject) {
+                        return value == 1 ?
+//                            '<span class="label label-danger">禁用</span>' :
+                            "<input type='button' value='禁用' class='btn btn-danger btn-xs' onclick='subType(\" " + options.rowId + " \")' />" :
+                            "<input type='button' value='正常' class='btn btn-success btn-xs'onclick='subType(\" " + options.rowId + " \")' />" ;
+                    }
+                },
+                {
+                    label: '操作',
+                    name: 'cid',
+                    index: "cid",
+                    width: 220,
+                    formatter: function (value, options, rowObject) {
+                        return "<a class='btn btn-primary btn-xs' onclick='deleteByid(\" " + value + " \")'><i class='fa fa-trash-o'></i>&nbsp;删除</a>" +
+                        "<a class='btn btn-primary btn-xs' onclick='updateByid(\" " + value + " \")'><i class='fa fa-pencil-square-o'></i>&nbsp;修改</a>" ;
+                    }
+                }
+            ],
+            viewrecords: true,
+            height: 385,
+            rowNum: 10,
+            rowList: [10, 30, 50],
+            rownumbers: true,
+            rownumWidth: 25,
+            autowidth: true,
+            multiselect: true,
+            pager: "#jqGridPager",
+            jsonReader: {
+                root: "page.list",
+                page: "page.currPage",
+                total: "page.totalPage",
+                records: "page.totalCount"
+            },
+            prmNames: {
+                page: "page",
+                rows: "limit",
+                order: "order"
+            },
+            gridComplete: function () {
+                //隐藏grid底部滚动条
+                $("#jqGrid").closest(".ui-jqgrid-bdiv").css({"overflow-x": "hidden"});
+            }
+        });
+    });
+//    var setting = {
+//        data: {
+//            simpleData: {
+//                enable: true,
+//                idKey: "deptId",
+//                pIdKey: "parentId",
+//                rootPId: -1
+//            },
+//            key: {
+//                url: "nourl"
+//            }
+//        }
+//    };
+    var ztree;
+    var layedit;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            q: {
+                planName: null
+            },
+            showList: true,
+            title: null,
+            roleList: {},
+            drainage: {
+                planName: null,
+                createTime: null,
+                endTime: null,
+                fanwei: null,
+                position: null,
+                planFlow: null,
+                planType: 1
+            },
+            planDate: [],
+            planTime: "",
+            planChannels: [],
+            selectedChannels: [],
+            flowFlag : false,
+            positionList : [],
+            drainageList : []
+        },
+        methods: {
+            query: function () {
+                vm.reload();
+            },
+            add: function () {
+                vm.showList = false;
+                vm.title = "新增";
+                vm.roleList = {};
+                vm.drainage = {
+                    planName: null,
+                    createTime: null,
+                    endTime: null,
+                    fanwei: null,
+                    position: null,
+                    planFlow: null,
+                    planType: null
+                };
+            },
+            //修改按钮
+            update: function () {
+                var id = getSelectedRow();
+                var rowData = jQuery("#jqGrid").jqGrid("getRowData", id);
+
+
+
+                var drainageId = rowData.cid;
+                if (drainageId == null) {
+                    return;
+                }
+
+                vm.showList = false;
+                vm.title = "修改";
+
+                vm.getDrainage(drainageId);
+
+            },
+            //删除引流数据，可以批量删除
+            del: function () {
+                var drainageIds = [];
+                var ids = getSelectedRows();
+                for (var i = 0; i < ids.length; i++) {
+                    var rowData = jQuery("#jqGrid").jqGrid("getRowData", ids[i]);
+                    drainageIds.push(rowData.cid)
+                }
+
+
+//                console.info(drainageIds)
+
+
+                if (drainageIds == null) {
+                    return;
+                }
+
+                //
+                confirm('确定要删除选中的记录？', function () {
+                    $.ajax({
+                        type: "POST",
+                        url: baseURL + "sys/drainage/delete",
+                        contentType: "application/json",
+                        data: JSON.stringify(drainageIds),
+                        success: function (r) {
+                            if (r.code == 0) {
+                                alert('操作成功', function () {
+                                    vm.reload();
+                                });
+                            } else {
+                                alert(r.msg);
+                            }
+                        }
+                    });
+                });
+            },
+            //保存和修复
+            saveOrUpdate: function () {
+
+                //非空校验
+                var planName=$("#planName").val();
+                if (planName == '' || planName == undefined || planName == null){
+                    $("#planName").css('borderColor','red'); //添加css样式
+                    alert("计划名称不能为空")
+                    return;
+                }else {
+                    $("#planName").css('borderColor',''); //取消css样式
+                }
+
+                var planTime=$("#planTime").val();
+                if (planTime == '' || planTime == undefined || planTime == null){
+                    $("#planTime").css('borderColor','red'); //添加css样式
+                    alert("计划时间不能为空")
+                    return;
+                }else {
+                    $("#planTime").css('borderColor',''); //取消css样式
+                }
+
+                var fanwei=$("#fanwei").val();
+                if (fanwei == '' || fanwei == undefined || fanwei == null){
+                    $("#fanwei").css('borderColor','red'); //添加css样式
+                    alert("引流范围不能为空")
+                    return;
+                }else {
+                    $("#fanwei").css('borderColor',''); //取消css样式
+                }
+
+                var position=$("#position").val();
+                if (position == '' || position == undefined || position == null){
+                    $("#position").css('borderColor','red'); //添加css样式
+                    alert("引流位置不能为空")
+                    return;
+                }else {
+                    $("#position").css('borderColor',''); //取消css样式
+                }
+
+                var planFlow=$("#planFlow").val();
+                if (planFlow == '' || planFlow == undefined || planFlow == null){
+                    $("#planFlow").css('borderColor','red'); //添加css样式
+                    alert("计划流量不能为空")
+                    return;
+                }else {
+                    $("#planFlow").css('borderColor',''); //取消css样式
+                }
+
+                var planType=$("#planType").val();
+                if (planType == '' || planType == undefined || planType == null){
+                    $("#planType").css('borderColor','red'); //添加css样式
+                    alert("计划状态不能为空")
+                    return;
+                }else {
+                    $("#planType").css('borderColor',''); //取消css样式
+                }
+
+
+
+
+
+                //提交数据
+                var url = "sys/drainage/saveOrUpdate";
+                $.ajax({
+                    type: "POST",
+                    url: baseURL + url,
+                    contentType: "application/json",
+                    data: JSON.stringify(vm.drainage),
+                    success: function (r) {
+                        if (r.code === 0) {
+                            alert('操作成功', function () {
+                                vm.reload();
+                            });
+                        } else {
+                            alert(r.msg);
+                        }
+                    }
+                });
+            },
+            //根据id获得对应引流对象
+            getDrainage: function (drainageId) {
+                var url = "sys/drainage/getDrainageById/" + drainageId;
+                $.ajax({
+                    type: "get",
+                    url: baseURL + url,
+                    contentType: "application/json",
+                    data: "",
+                    success: function (r) {
+                        vm.drainage = r.drainage;
+                        //获取时间，拼凑字符串
+                        vm.planTime = vm.drainage.createTime + " ~ " + vm.drainage.endTime;
+                        if (vm.drainage.planType == 0) {
+                            $('#mySwitch').bootstrapSwitch('setState', true); // true || false
+                        } else {
+                            $('#mySwitch').bootstrapSwitch('setState', false); // true || false
+                        }
+
+                        vm.selectedChannels = vm.drainage.position.split(",");
+
+                    }
+                });
+            },
+            reload: function () {
+                vm.showList = true;
+                var page = $("#jqGrid").jqGrid('getGridParam', 'page');
+                $("#jqGrid").jqGrid('setGridParam', {
+                    postData: {'planName': vm.q.planName},
+                    page: page
+                }).trigger("reloadGrid");
+            },
+            //计划流量，点击按钮把数据写到index中
+            subFlow: function (number) {
+                vm.drainage.planFlow = number;
+            },
+            //点击引流位置改变样式
+            subPosition: function (a, e) {
+                var el = e.target;
+                var planChannel = $(el).html();
+
+                console.info(planChannel)
+
+                if (vm.planChannels.indexOf(planChannel) != -1) {
+                    var index = vm.planChannels.indexOf(planChannel);
+                    vm.planChannels.splice(index, 1);
+                    var position = document.getElementById("position" + a);
+//                    position.style.backgroundColor = 'blue'
+                    $(el).removeClass("label label-success").addClass("label label-default");
+                } else {
+                    vm.planChannels.push(planChannel);
+                    var position = document.getElementById("position" + a);
+//                    position.style.backgroundColor = 'green'
+                    $(el).removeClass("label label-default").addClass("label label-success");
+                }
+
+
+//                    alert(position.style.backgroundColor);
+//                   var style=position.style;
+//                    alert(style.backgroundColor);//red
+//
+//                     myDiv.style.backgroundColor='green';//myDiv背景色变为绿色
+//                alert(root);//200px
+//                alert(number)
+            },
+            //选完引流位置，点击确定打开上传等功能框
+            savePosition: function (e) {
+                vm.drainage.position = vm.planChannels.join(",");
+//                console.info(vm.drainage.position)
+                $("#position").val(vm.drainage.position);
+                if (vm.planChannels) {
+                    vm.selectedChannels = [];
+                    //vm.planChannels=planChannel.split(",");
+                    $.each(vm.planChannels, function (ind, item) {
+                        $.each(vm.planChannels, function (index, c) {
+                            if (c == item) {
+                                vm.selectedChannels.push(c);
+                            }
+                        });
+                    });
+                }
+                console.info(vm.planChannels)
+
+            },
+            //流量自定义
+            customFlow : function (e) {
+                var el = e.target.checked;
+                var position = document.getElementById("planFlow");
+                if(el){
+                    position.disabled = ""
+                }else{
+                    position.disabled = "disabled"
+                }
+                console.info(el)
+            },
+            closePositionWin : function (e) {
+                alert(1)
+                var el = e.target;
+                if(vm.planChannels != null){
+                    $(el).removeClass("label label-default").addClass("label label-success");
+                }
+            }
+
+        },
+        created : function () {
+            $.ajax({
+                type: "get",
+                url: baseURL + "sys/position/list",
+                contentType: "application/json",
+                data: "",
+                success: function (r) {
+//                   console.info(r.positionList)
+                    vm.positionList = r.positionList
+                }
+            });
+
+            $.ajax({
+                type: "get",
+                url: baseURL + "sys/drainage/findAll",
+                contentType: "application/json",
+                data: "",
+                success: function (r) {
+                    vm.drainageList = r.drainageList
+                }
+            });
+        }
+
+    });
+    $(function () {
+        laydate.render({
+            elem: '#planTime',
+            type: 'datetime',
+            range: '~',
+            done: function (value, date, endDate) {
+                vm.planTime = value;
+//                console.info(value);
+                var s = value.split(" ~ ");
+//                console.info(s[1]);
+                vm.drainage.createTime = s[0];
+                vm.drainage.endTime = s[1];
+            }
+        });
+    })
+
+    $(function () {
+        $('#mySwitch').on('switch-change', function (e, data) {
+            var $el = $(data.el)
+                , value = data.value;
+//            console.log(e);
+//            console.log( $el);
+//            console.log(value);
+            if (value) {
+                vm.drainage.planType = 0
+            } else {
+                vm.drainage.planType = 1
+            }
+        });
+    })
+
+function subType(a) {
+    var cid = '';
+    var rowData = vm.drainageList
+    for(var i = 0 ; i < rowData.length ; i ++){
+        if(a == i+1){
+            console.info(rowData[i])
+            cid = rowData[i].cid
+        }
+    }
+    confirm('确定要修改计划状态吗？', function () {
+        $.ajax({
+            type: "get",
+            url: baseURL + "sys/drainage/subType/"+cid,
+            contentType: "application/json",
+            data: "",
+            success: function (r) {
+                if (r.code == 0) {
+                    alert('操作成功', function () {
+                        vm.reload();
+                    });
+                } else {
+                    alert(r.msg);
+                }
+            }
+        });
+    });
+
+}
+function deleteByid(a) {
+    var cid = '';
+    var rowData = vm.drainageList
+    for(var i = 0 ; i < rowData.length ; i ++){
+        if(a == rowData[i].cid){
+            console.info(rowData[i])
+            cid = rowData[i].cid
+        }
+    }
+    confirm('确定要删除选中的记录？', function () {
+        $.ajax({
+            type: "POST",
+            url: baseURL + "sys/drainage/deleteByid/"+cid,
+            contentType: "application/json",
+            data: "",
+            success: function (r) {
+                if (r.code == 0) {
+                    alert('操作成功', function () {
+                        vm.reload();
+                    });
+                } else {
+                    alert(r.msg);
+                }
+            }
+        });
+    });
+
+}
+function updateByid(a) {
+    var cid = '';
+    var rowData = vm.drainageList
+    for(var i = 0 ; i < rowData.length ; i ++ ){
+        if(a == rowData[i].cid){
+            console.info(rowData[i])
+            console.info(i)
+            cid = rowData[i].cid
+        }
+    }
+    vm.showList = false;
+    vm.title = "修改";
+
+    vm.getDrainage(cid);
+}
+
+</script>
+</body>
+</html>

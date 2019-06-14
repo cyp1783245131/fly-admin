@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>fly</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/font-awesome.min.css">
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/all-skins.min.css">
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/main.css">
+    <link rel="stylesheet" href="${request.contextPath}/statics/css/fly_style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <link href="${request.contextPath}/statics/css/index_style.css" rel="stylesheet" type="text/css">
+    <![endif]-->
+<body>
+
+<div class="fly_b">
+
+    <div class="header" id="demo">
+        <div class="canvaszz">
+            <div class="f_bg_m">
+                <div class="f_bg_up">
+                    <div class="f_w_1">
+                        <img src="${request.contextPath}/statics/img/w1.png"/>
+                    </div>
+                </div>
+                <!--<div class="f_bg_down"></div>-->
+            </div>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+
+    <div class="dl_bg"></div>
+    <div  id="rrapp" class="rrapp" v-cloak>
+        <div class="f_w_2">
+            <img src="${request.contextPath}/statics/img/w2.png"/>
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body" v-show="showLogin" style="background:none;">
+
+            <div v-if="error" class="alert alert-danger alert-dismissible">
+                <h4 style="margin-bottom: 0px;"><i class="fa fa-exclamation-triangle"></i> {{errorMsg}}</h4>
+            </div>
+            <div class="form-group has-feedback fly_br">
+                <input type="text" class="form-control" v-model="username" placeholder="账号" style="border-radius:5px;">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback fly_br">
+                <input type="password" class="form-control" v-model="password" placeholder="密码" style="border-radius:5px;">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <!--<div class="form-group has-feedback">-->
+                <!--<input type="text" class="form-control" v-model="captcha" @keyup.enter="login" placeholder="验证码" style="border-radius:5px;">-->
+                <!--<span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>-->
+            <!--</div>-->
+            <!--<div class="form-group has-feedback">-->
+                <!--<img alt="如果看不清楚，请单击图片刷新！" class="pointer" :src="src" @click="refreshCode">-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" @click="refreshCode">点击刷新</a>-->
+            <!--</div>-->
+
+
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox icheck">
+                    </div>
+                </div>
+                <!-- /.col -->
+                <div class="col-xs-12">
+                    <!--<button type="button" style="width: 45%; float:left;" class="btn btn-primary btn-block btn-flat" @click="toReg">注册</button> -->
+                    <button type="button" style=" background-color:#46a5fe; border-radius:5px; border: none;" class="btn btn-primary btn-block btn-flat" @click="login">登录</button>
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.social-auth-links -->
+
+        </div>
+        <!-- /.login-box-body -->
+        <!-- /.reg-logo -->
+        <div class="login-box-body" v-show="showReg">
+            <p class="login-box-msg">用户注册</p>
+            <div v-if="error" class="alert alert-danger alert-dismissible">
+                <h4 style="margin-bottom: 0px;"><i class="fa fa-exclamation-triangle"></i> {{errorMsg}}</h4>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" v-model="sysUser.username" placeholder="注册用户">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" v-model="sysUser.realname" placeholder="真实姓名">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" v-model="sysUser.password" placeholder="注册密码">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" v-model="sysUser.confirmPasswd" placeholder="确认密码">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" v-model="sysUser.certificatenum" placeholder="身份证号码">
+                <span class="glyphicon glyphicon-certificate form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="number" class="form-control" v-model="sysUser.bankno" placeholder="银行账户">
+                <span class="glyphicon glyphicon-piggy-bank form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="number" class="form-control" v-model="sysUser.mobile" placeholder="手机号码">
+                <span class="glyphicon glyphicon-phone form-control-feedback"></span>
+            </div>
+            <!--<div class="form-group has-feedback">-->
+                <!--<input type="text" class="form-control" v-model="sysUser.captcha" @keyup.enter="register" placeholder="验证码">-->
+                <!--<span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>-->
+            <!--</div>-->
+            <!--<div class="form-group has-feedback">-->
+                <!--<img alt="如果看不清楚，请单击图片刷新！" class="pointer" :src="src" @click="refreshCode">-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" @click="refreshCode">点击刷新</a>-->
+            <!--</div>-->
+
+
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox icheck">
+                    </div>
+                </div>
+                <!-- /.col -->
+                <div class="col-xs-6">
+                    <button type="button" style="width: 45%; float:left;" class="btn btn-primary btn-block btn-flat" @click="register">注册</button>
+                    <button type="button" style="width: 45%; float:right;margin-top:0px;" class="btn btn-primary btn-block btn-flat" @click="toLogin">登录</button>
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.social-auth-links -->
+
+        </div>
+        <!-- /.reg-box-body -->
+    </div>
+</div>
+
+<!-- /.login-box -->
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/jquery.slimscroll.min.js"></script>
+<script src="${request.contextPath}/statics/libs/fastclick.min.js"></script>
+<script src="${request.contextPath}/statics/libs/app.js"></script>
+<script type="text/javascript">
+    var vm = new Vue({
+        el:'#rrapp',
+        data:{
+            username: '',
+            password: '',
+            confimPasswd:'',
+            captcha: '',
+            error: false,
+            errorMsg: '',
+            showLogin:true,
+            showReg:false,
+//            src: 'captcha.jpg',
+            sysUser:{
+
+            }
+        },
+        beforeCreate: function(){
+            if(self != top){
+                top.location.href = self.location.href;
+            }
+        },
+        methods: {
+            refreshCode: function(){
+                this.src = "captcha.jpg?t=" + $.now();
+            },
+            toReg:function (event) {
+                vm.showLogin=false;
+                vm.showReg=true;
+                vm.error = false;
+                vm.errorMsg = '';
+                vm.refreshCode();
+            },
+            toLogin:function (event) {
+                vm.showLogin=true;
+                vm.showReg=false;
+                vm.error = false;
+                vm.errorMsg = '';
+                vm.refreshCode();
+            },
+            register:function (event) {
+                if(!vm.sysUser.username){
+                    vm.error = true;
+                    vm.errorMsg = '注册用户不能为空！';
+                    vm.refreshCode();
+                    return;
+                }
+                if(!vm.sysUser.password){
+                    vm.error = true;
+                    vm.errorMsg = '注册密码不能为空！';
+                    vm.refreshCode();
+                    return;
+                }
+                if(!vm.sysUser.confirmPasswd){
+                    vm.error = true;
+                    vm.errorMsg = '确认密码不能为空！';
+                    vm.refreshCode();
+                    return;
+                }
+
+                if(vm.sysUser.password!=vm.sysUser.confirmPasswd){
+                    vm.error = true;
+                    vm.errorMsg = '两次密码输入不匹配！';
+                    vm.refreshCode();
+                    return;
+                }
+
+//                if(!vm.sysUser.captcha){
+//                    vm.error = true;
+//                    vm.errorMsg = '验证码不能为空！';
+//                    vm.refreshCode();
+//                    return;
+//                }
+
+                //注册用户
+                $.ajax({
+                    type: "POST",
+                    url: "sys/register",
+                    data: JSON.stringify(vm.sysUser),
+                    contentType: "application/json",
+                    success: function(result){
+                        if(result.code == 0){//注册成功
+                            parent.location.href ='index.html';
+                        }else{
+                            vm.error = true;
+                            vm.errorMsg = result.msg;
+                            vm.refreshCode();
+                        }
+                    },failure:function (result) {
+                        console.log(result);
+                    }
+                });
+
+            },
+            login: function (event) {
+                var data = "username="+vm.username+"&password="+vm.password;
+                $.ajax({
+                    type: "POST",
+                    url: "sys/login",
+                    data: data,
+                    dataType: "json",
+                    success: function(result){
+                        if(result.code == 0){//登录成功
+                            parent.location.href ='index.html';
+                        }else{
+                            vm.error = true;
+                            vm.errorMsg = result.msg;
+
+                            vm.refreshCode();
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    //宇宙特效
+    "use strict";
+    var canvas = document.getElementById('canvas'),
+        ctx = canvas.getContext('2d'),
+        w = canvas.width = window.innerWidth,
+        h = canvas.height = window.innerHeight,
+
+        hue = 217,
+        stars = [],
+        count = 0,
+        maxStars = 1300;//星星数量
+
+    var canvas2 = document.createElement('canvas'),
+        ctx2 = canvas2.getContext('2d');
+    canvas2.width = 100;
+    canvas2.height = 100;
+    var half = canvas2.width / 2,
+        gradient2 = ctx2.createRadialGradient(half, half, 0, half, half, half);
+    gradient2.addColorStop(0.025, '#CCC');
+    gradient2.addColorStop(0.1, 'hsl(' + hue + ', 61%, 33%)');
+    gradient2.addColorStop(0.25, 'hsl(' + hue + ', 64%, 6%)');
+    gradient2.addColorStop(1, 'transparent');
+
+    ctx2.fillStyle = gradient2;
+    ctx2.beginPath();
+    ctx2.arc(half, half, half, 0, Math.PI * 2);
+    ctx2.fill();
+
+    // End cache
+
+    function random(min, max) {
+        if (arguments.length < 2) {
+            max = min;
+            min = 0;
+        }
+
+        if (min > max) {
+            var hold = max;
+            max = min;
+            min = hold;
+        }
+
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function maxOrbit(x, y) {
+        var max = Math.max(x, y),
+            diameter = Math.round(Math.sqrt(max * max + max * max));
+        return diameter / 2;
+        //星星移动范围，值越大范围越小，
+    }
+
+    var Star = function() {
+
+        this.orbitRadius = random(maxOrbit(w, h));
+        this.radius = random(60, this.orbitRadius) / 8;
+        //星星大小
+        this.orbitX = w / 2;
+        this.orbitY = h / 2;
+        this.timePassed = random(0, maxStars);
+        this.speed = random(this.orbitRadius) / 50000;
+        //星星移动速度
+        this.alpha = random(2, 10) / 10;
+
+        count++;
+        stars[count] = this;
+    }
+
+    Star.prototype.draw = function() {
+        var x = Math.sin(this.timePassed) * this.orbitRadius + this.orbitX,
+            y = Math.cos(this.timePassed) * this.orbitRadius + this.orbitY,
+            twinkle = random(10);
+
+        if (twinkle === 1 && this.alpha > 0) {
+            this.alpha -= 0.05;
+        } else if (twinkle === 2 && this.alpha < 1) {
+            this.alpha += 0.05;
+        }
+
+        ctx.globalAlpha = this.alpha;
+        ctx.drawImage(canvas2, x - this.radius / 2, y - this.radius / 2, this.radius, this.radius);
+        this.timePassed += this.speed;
+    }
+
+    for (var i = 0; i < maxStars; i++) {
+        new Star();
+    }
+
+    function animation() {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 0.5; //尾巴
+        ctx.fillStyle = 'hsla(' + hue + ', 64%, 6%, 2)';
+        ctx.fillRect(0, 0, w, h)
+
+        ctx.globalCompositeOperation = 'lighter';
+        for (var i = 1, l = stars.length; i < l; i++) {
+            stars[i].draw();
+        };
+
+        window.requestAnimationFrame(animation);
+    }
+
+    animation();
+</script>
+
+</body>
+</html>

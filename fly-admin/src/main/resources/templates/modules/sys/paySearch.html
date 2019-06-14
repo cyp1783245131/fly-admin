@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>付款余额明细</title>
+    <#include "/header.html"/>
+</head>
+
+<body>
+<script>
+
+    function Select1(){
+        $.ajax({
+            type: "get",
+            url: baseURL + "sys/paySearch/download",
+            contentType: "application/json",
+            success: function(r){
+                alert("导出成功")
+            }
+        });
+    }
+
+</script>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" id="starttime" v-model="q.starttime" @keyup.enter="query" placeholder="开始时间">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" id="endtime" v-model="q.endtime" @keyup.enter="query" placeholder="结束时间">
+            </div>
+            <a class="btn btn-primary" @click="query">&nbsp;查询</a>
+            <a class="btn btn-primary" @click="viewRecord"></i>&nbsp;明细查看</a>
+            <a class="btn btn-primary" onclick="Select1();">&nbsp;导出</a>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/paySearch.js?_${.now?long}"></script>
+<script src="${request.contextPath}/statics/libs/laydate/laydate.js"></script>
+<script>
+    //开始时间
+    laydate.render({
+        elem: '#starttime',
+        type: 'date'
+    });
+
+    //结束时间
+    laydate.render({
+        elem: '#endtime',
+        type: 'date'
+    });
+</script>
+
+</body>
+</html>

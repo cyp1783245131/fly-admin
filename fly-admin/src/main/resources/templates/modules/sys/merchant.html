@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>商户列表</title>
+    <#include "/header.html">
+<body>
+<div id="app" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.merchantName" @keyup.enter="query" placeholder="租户名称">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <#if shiro.hasPermission("sys:merchant:save")>
+                <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            </#if>
+            <!--<#if shiro.hasPermission("sys:merchant:update")>-->
+                <!--<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>-->
+            <!--</#if>-->
+            <!--<#if shiro.hasPermission("sys:merchant:delete")>-->
+                <!--<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;批量删除</a>-->
+            <!--</#if>-->
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">租户名称</div>
+                <div class="col-sm-10">
+                    <input type="text" id="merchantName" class="form-control" v-model="merchant.merchantName" placeholder="租户名称"/>
+                    <input type="hidden" name="mid" id="mid" v-model="merchant.mid">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">租户简称</div>
+                <div class="col-sm-10">
+                    <input type="text" id="merchantJiancheng" class="form-control" v-model="merchant.merchantJiancheng" placeholder="租户简称"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">合同开始时间</div>
+                <div class="col-sm-10">
+                    <input type="datetime" class="form-control" name="createTime" id="contractCreateTime" style="width: 370px"
+                           v-model="merchant.contractCreateTime" readonly="readonly" placeholder="合同开始时间">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">合同结束时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="endTime" id="contractEndTime" style="width: 370px"
+                           v-model="merchant.contractEndTime" readonly="readonly" placeholder="合同结束时间">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">开通时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="openTime" id="openTime" style="width: 370px"
+                           v-model="merchant.openTime" readonly="readonly" placeholder="开通时间">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">结束时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="endTime" id="endTime" style="width: 370px"
+                           v-model="merchant.endTime" readonly="readonly" placeholder="结束时间">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">合同编号</div>
+                <div class="col-sm-10">
+                    <input type="text" id="contraceNumber" class="form-control" v-model="merchant.contraceNumber" placeholder="合同编号"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">开通状态</div>
+                <div class="col-sm-10" id="mySwitch">
+                    <div class="switch" data-on="danger" data-off="primary">
+                        <input id="merchantType" type="checkbox" v-model="merchant.merchantType"/>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="deptLayer" style="display: none;padding:10px;">
+    <ul id="deptTree" class="ztree"></ul>
+</div>
+<script src="${request.contextPath}/statics/js/modules/sys/merchant.js?_${.now?long}"></script>
+</body>
+</html>

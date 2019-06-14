@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>引流统计</title>
+    <#include "/header.html">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"
+          rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+</head>
+<body>
+<div id="rrapp"  style="background-color:#fafafa;" v-cloak>
+    <div class="qs_clear">
+
+    </div>
+</div>
+
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active">
+        <a href="#home" data-toggle="tab">引流列表</a>
+    </li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="home">
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-2 control-label"></div>
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        <!--<input type="button" class="btn btn-primary" onclick="query()" value="确定"/>-->
+        <input type="button" name="Submit" class="btn btn-primary" onclick="javascript:history.back(-1);" value="确定">
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        <!--<input type="button" class="btn btn-warning" onclick="reload()" value="返回"/>-->
+        <input type="button" name="Submit" class="btn btn-primary" onclick="javascript:history.back(-1);" value="返回">
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/sfcomin.js?_${.now?long}"></script>
+</body>
+
+<link rel="stylesheet" href="${request.contextPath}/statics/css/AdminLTE.min.css">
+<link rel="stylesheet" href="${request.contextPath}/statics/css/fly_style.css">
+</html>

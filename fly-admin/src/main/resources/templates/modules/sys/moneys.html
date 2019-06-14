@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>资金池</title>
+    <#include "/header.html"/>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <#if shiro.hasPermission("sys:moneys:update")>
+            <a class="btn btn-primary" @click="update">&nbsp;编辑</a>
+        </#if>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">ID</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="moneys.phoneid" placeholder="ID"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">姓名</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="moneys.pname" placeholder="姓名"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">资金池余额</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="moneys.psave" placeholder="资金池余额"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/moneys.js?_${.now?long}"></script>
+<script src="${request.contextPath}/statics/libs/laydate/laydate.js"></script>
+
+</body>
+</html>

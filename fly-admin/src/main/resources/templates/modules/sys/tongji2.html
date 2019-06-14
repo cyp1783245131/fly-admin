@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>排查统计</title>
+    <#include "/header.html"/>
+</head>
+<body>
+<script>
+
+    function Select1(){
+        $.ajax({
+            type: "get",
+            url: baseURL + "sys/tongji/download",
+            contentType: "application/json",
+            success: function(r){
+                alert("导出成功")
+            }
+        });
+    }
+
+    function Select2(){
+        $.ajax({
+            type: "get",
+            url: baseURL + "sys/tongji/download",
+            contentType: "application/json",
+            success: function(r){
+                alert("导出成功")
+            }
+        });
+    };
+
+</script>
+<div id="rrapp"  style="background-color:#fafafa;" v-cloak>
+    <div class="qs_clear">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="info-box" style="box-shadow:1px 1px 1px rgba(0,0,0,0.1)">
+                <div class="f_sr_m">
+                    <div class="f_sr_u f_color_1">
+                        <div class="f_sr_w">总排查次数</div>
+                        <div class="f_sr_z"></div>
+                    </div>
+                    <div class="f_sr_d">
+                        <span id="z_count"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="info-box" style="box-shadow:1px 1px 1px rgba(0,0,0,0.1)">
+                <div class="f_sr_m">
+                    <div class="f_sr_u f_color_2">
+                        <div class="f_sr_w">低风险排查数量</div>
+                        <div class="f_sr_z"></div>
+                    </div>
+                    <div class="f_sr_d">
+                        <span id="d_count"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active">
+        <a href="#home" data-toggle="tab">低风险列表</a>
+    </li>
+    <li><a href="#ios" data-toggle="tab">总排查列表</a></li>
+
+    <li class="dropdown">
+        <a href="#" id="myTabDrop1" class="dropdown-toggle"
+           data-toggle="dropdown">导出 <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+            <li>
+                <a href="#lowExport" tabindex="-1" data-toggle="tab" onclick="Select1();">导出低风险列表</a>
+            </li>
+            <li>
+                <a href="#allExport" tabindex="-1" data-toggle="tab" onclick="Select2();">导出总排查列表</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="home">
+        <table id="jqLowGrid"></table>
+        <div id="jqLowGridPager"></div>
+    </div>
+    <div class="tab-pane fade" id="ios">
+        <table id="jqAllGrid"></table>
+        <div id="jqAllGridPager"></div>
+    </div>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/tongji2.js?_1558056647351"></script>
+
+<link rel="stylesheet" href="${request.contextPath}/statics/css/AdminLTE.min.css">
+<link rel="stylesheet" href="${request.contextPath}/statics/css/fly_style.css">
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.sys.dao.SysMerchantDao">
+
+    <select id="queryList" resultType="io.renren.modules.sys.entity.SysMerchantEntity">
+        select * from sys_merchant where merchant_type = 0
+        <if test="sql_filter != null">
+            and ${sql_filter}
+        </if>
+    </select>
+
+    <select id="findByMid" resultType="io.renren.modules.sys.entity.SysMerchantEntity">
+        select * from sys_merchant where mid not in (select mid from sys_dept)
+    </select>
+</mapper>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>引流列表</title>
+    <#include "/header.html">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"
+          rel="stylesheet">
+        <link href="${request.contextPath}/statics/css/style.css" type="text/css" rel="stylesheet">
+
+        <script src="${request.contextPath}/statics/libs/js/City_data.js"></script>
+        <script src="${request.contextPath}/statics/libs/js/areadata.js"></script>
+        <script src="${request.contextPath}/statics/libs/js/auto_area.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.dname" @keyup.enter="query" placeholder="用户手机号">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            <#if shiro.hasPermission("sys:fwmuser:save")>
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            </#if>
+            <#if shiro.hasPermission("sys:fwmuser:update")>
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+            </#if>
+            <#if shiro.hasPermission("sys:fwmuser:delete")>
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+            </#if>
+            <#if shiro.hasPermission("sys:fwmuser:import")>
+            <a class="btn btn-primary"><i class="fa fa-reply"></i>&nbsp;导入模板</a>
+            <a class="btn btn-primary" id="importWmUser"><i class="fa fa-reply"></i>&nbsp;导入用户</a>
+            </#if>
+</div>
+<table id="jqGrid"></table>
+<div id="jqGridPager"></div>
+</div>
+
+<div v-show="!showList" class="panel panel-default">
+    <div class="panel-heading">{{title}}</div>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div class="col-sm-2 control-label">手机号ID</div>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="mobile" v-model="fwmuser.mobile" placeholder="手机号ID"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">姓名</div>
+            <div class="col-sm-10">
+                <input type="text" id="name" class="form-control" v-model="fwmuser.name" placeholder="姓名"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">身份证号</div>
+            <div class="col-sm-10">
+                <input type="text" id="certifynum" class="form-control" v-model="fwmuser.certifynum"
+                       placeholder="身份证号码"/>
+            </div>
+        </div>
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">城市编码</div>
+            <div class="col-sm-10">
+                <input type="text" id="cityid" class="form-control" v-model="fwmuser.cityid" placeholder="城市编码"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">城市</div>
+            <div class="col-sm-10">
+                <!--<input type="text" id="cityname" class="form-control" v-model="fwmuser.cityname" placeholder="城市"/>-->
+                <input type="text" id="cityname" class=" form-control area-danxuan" v-model="fwmuser.cityname"
+                       placeholder="城市"/>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">密码</div>
+            <div class="col-sm-10">
+                <input type="password" id="password" class="form-control" autocomplete="new-password"
+                       v-model="fwmuser.password" placeholder="密码"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">确认密码</div>
+            <div class="col-sm-10">
+                <input type="password" id="cpassword" class="form-control" v-model="fwmuser.cpassword"
+                       placeholder="确认密码"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">银行卡号</div>
+            <div class="col-sm-10">
+                <input type="text" id="banknum" class="form-control" v-model="fwmuser.banknum" placeholder="银行卡号"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">银行名称</div>
+            <div class="col-sm-10">
+                <input type="text" id="bankname" class="form-control" v-model="fwmuser.bankname" placeholder="银行名称"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label">银行开户行</div>
+            <div class="col-sm-10">
+                <input type="text" id="openbank" class="form-control" v-model="fwmuser.openbank" placeholder="银行开户行"/>
+            </div>
+        </div>
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">创建时间</div>
+            <div class="col-sm-10">
+                <input type="text" id="ctime" class="form-control" v-model="fwmuser.ctime" placeholder="创建时间"/>
+            </div>
+        </div>
+        <div class="form-group" hidden>
+            <div class="col-sm-2 control-label">修改时间</div>
+            <div class="col-sm-10">
+                <input type="text" id="utime" class="form-control" v-model="fwmuser.utime" placeholder="修改时间"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label"></div>
+            <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+            &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+        </div>
+    </form>
+</div>
+</div>
+
+
+<!--&lt;!&ndash; 选择部门 &ndash;&gt;-->
+<!--<div id="deptLayer" style="display: none;padding:10px;">-->
+<!--<ul id="deptTree" class="ztree"></ul>-->
+<!--</div>-->
+
+<script src="${request.contextPath}/statics/js/modules/sys/fwmuser.js?_${.now?long}"></script>
+
+
+<script>
+    layui.use(['laydate', 'upload'], function () {
+        var $ = layui.jquery, upload = layui.upload;
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#importWmUser'
+            , url: baseURL + 'sys/fwmuser/import'
+            , accept: 'file' //普通文件
+            , exts: 'xls|xlsx' //只允许上传xls文件
+            , done: function (result) {
+                if (result.code == 0) {
+                    location.reload();
+                } else {
+                    alert(result.msg);
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+
+
+</html>
